@@ -1,4 +1,4 @@
-require('dotenv').config({ path: 'variable.env' });
+require('dotenv').config({path: 'variable.env'});
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,7 +17,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/pusher/auth', function(req, res) {
   var socketId = req.body.socket_id;
@@ -29,7 +29,7 @@ app.post('/pusher/auth', function(req, res) {
 const todos = [];
 
 app.get('/items', (req, res) => {
-  res.status(200).send({ tasks: todos });
+  res.status(200).send({tasks: todos});
 });
 
 app.post('/items', (req, res) => {
@@ -38,7 +38,7 @@ app.post('/items', (req, res) => {
   if (title === undefined) {
     res
       .status(400)
-      .send({ message: 'Please provide your todo item', status: false });
+      .send({message: 'Please provide your todo item', status: false});
     return;
   }
 
@@ -55,9 +55,7 @@ app.post('/items', (req, res) => {
   });
 
   if (index >= 0) {
-    res
-      .status(400)
-      .send({ message: 'TODO item already exists', status: false });
+    res.status(400).send({message: 'TODO item already exists', status: false});
     return;
   }
 
@@ -68,11 +66,11 @@ app.post('/items', (req, res) => {
 
   todos.push(item);
 
-  pusher.trigger('todo', 'items', item);
+  pusher.trigger('todo', 'item-added', item);
 
   res
     .status(200)
-    .send({ message: 'TODO item was successfully created', status: true });
+    .send({message: 'TODO item was successfully created', status: true});
 });
 
 app.post('/items/complete', (req, res) => {
@@ -80,7 +78,7 @@ app.post('/items/complete', (req, res) => {
 
   todos[idx].completed = true;
 
-  pusher.trigger('todo', 'complete', { index: idx });
+  pusher.trigger('todo', 'task-completed', {index: idx});
 
   res.status(200).send({
     status: true,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,8 +12,8 @@ import axios from 'axios';
 import Alert from './Alert';
 import Pusher from 'pusher-js/react-native';
 
-const APP_KEY = 'PUSHER_APP_KEY';
-const APP_CLUSTER = 'PUSHER_APP_CLUSTER';
+const APP_KEY = '6bd4e5a45b50788fa457';
+const APP_CLUSTER = 'ap2';
 
 export default class App extends Component {
   state = {
@@ -23,7 +23,7 @@ export default class App extends Component {
   };
 
   changeTextHandler = text => {
-    this.setState({ text: text });
+    this.setState({text: text});
   };
 
   addTask = () => {
@@ -33,7 +33,7 @@ export default class App extends Component {
     }
 
     axios
-      .post('http://localhost:5200/items', { title: this.state.text })
+      .post('http://localhost:5200/items', {title: this.state.text})
       .then(res => {
         if (res.data.status) {
           this.setState(prevState => {
@@ -66,16 +66,14 @@ export default class App extends Component {
   };
 
   markComplete = i => {
-    axios
-      .post('http://localhost:5200/items/complete', { index: i })
-      .then(res => {
-        if (res.data.status) {
-          this.setState(prevState => {
-            prevState.tasks[i].completed = true;
-            return { tasks: [...prevState.tasks] };
-          });
-        }
-      });
+    axios.post('http://localhost:5200/items/complete', {index: i}).then(res => {
+      if (res.data.status) {
+        this.setState(prevState => {
+          prevState.tasks[i].completed = true;
+          return {tasks: [...prevState.tasks]};
+        });
+      }
+    });
   };
 
   componentDidMount() {
@@ -90,12 +88,13 @@ export default class App extends Component {
       cluster: APP_CLUSTER,
     });
 
-    const channel = socket.subscribe('todo');
+    const channel = socket.subscribe('todo'); //todo channel
 
-    channel.bind('items', data => {
+    //event item-added
+    channel.bind('item-added', data => {
       if (!this.state.initiator) {
         this.setState(prevState => {
-          return { tasks: [...prevState.tasks, data] };
+          return {tasks: [...prevState.tasks, data]};
         });
       } else {
         this.setState({
@@ -103,12 +102,12 @@ export default class App extends Component {
         });
       }
     });
-
-    channel.bind('complete', data => {
+    //event task-completed
+    channel.bind('task-completed', data => {
       if (!this.state.initiator) {
         this.setState(prevState => {
           prevState.tasks[data.index].completed = true;
-          return { tasks: [...prevState.tasks] };
+          return {tasks: [...prevState.tasks]};
         });
       } else {
         this.setState({
@@ -120,21 +119,20 @@ export default class App extends Component {
 
   render() {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#F5FCFF' }}>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#F5FCFF'}}>
         <View style={[styles.container]}>
           <FlatList
             style={styles.list}
             data={this.state.tasks}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
+            renderItem={({item, index}) => (
               <View>
                 <View style={styles.listItemCont}>
                   <Text
                     style={[
                       styles.listItem,
-                      item.completed && { textDecorationLine: 'line-through' },
-                    ]}
-                  >
+                      item.completed && {textDecorationLine: 'line-through'},
+                    ]}>
                     {item.text}
                   </Text>
                   {!item.completed && (
